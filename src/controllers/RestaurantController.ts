@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Restaurant from "../models/restaurant";
+import { ObjectId } from "mongodb";
 
 const searchRestaurants = async (req: Request, res: Response) => {
   try {
@@ -63,4 +64,21 @@ const searchRestaurants = async (req: Request, res: Response) => {
   }
 };
 
-export default { searchRestaurants };
+const getRestaurantById = async (req: Request, res: Response) => {
+  try {
+    const restaurantId = req.params["restaurantId"];
+    if (!ObjectId.isValid(restaurantId))
+      res.status(404).json({ message: "Restaurant not found!" });
+    console.log({ restaurantId });
+    const restaurant = await Restaurant.findOne({ _id: restaurantId });
+    if (!restaurant)
+      return res.status(404).json({ message: "Restaurant not found!" });
+
+    return res.send(restaurant);
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).json({ message: "something went wrong!" });
+  }
+};
+
+export default { searchRestaurants, getRestaurantById };
