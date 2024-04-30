@@ -7,6 +7,7 @@ import myRestaurantRoute from "./routes/MyRestaurantRoute";
 import morgan from "morgan";
 import { v2 as cloudinary } from "cloudinary";
 import restaurantRoute from "./routes/RestaurantRoute";
+import orderRoute from "./routes/OrderRoute";
 
 mongoose.connect(process.env.DATABASE_CONNECTION_STRING as string).then(() => {
   console.log("Connected to the database");
@@ -19,6 +20,7 @@ cloudinary.config({
 });
 
 const app = express();
+app.use("/api/order/checkout/webhook", express.raw({ type: "*/*" }));
 app.use(express.json());
 app.use(cors());
 app.use(morgan("combined"));
@@ -31,6 +33,7 @@ app.get("/health", async (req: Request, res: Response) => {
 app.use("/api/my/user", myUserRoute);
 app.use("/api/my/restaurant", myRestaurantRoute);
 app.use("/api/restaurant", restaurantRoute);
+app.use("/api/order", orderRoute);
 
 app.listen(7000, () => {
   console.log("Server started on localhost:7000");
