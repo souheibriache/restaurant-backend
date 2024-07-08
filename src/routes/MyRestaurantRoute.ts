@@ -12,8 +12,20 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024, //5MB
   },
 });
+router.get(
+  "/order",
+  jwtCheck,
+  jwtParse,
+  MyResaurantController.getMyRestaurantOrders
+);
 
-// /api/my/restaurant
+router.patch(
+  "/order/:orderId/status",
+  jwtCheck,
+  jwtParse,
+  MyResaurantController.updateOrderStatus
+);
+
 router.get("/", jwtCheck, jwtParse, MyResaurantController.getMyRestaurant);
 
 router.post(

@@ -1,5 +1,25 @@
 import mongoose, { mongo } from "mongoose";
 
+const cartItemsSchema = new mongoose.Schema({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    default: new mongoose.Types.ObjectId(),
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  menuItemId: {
+    type: String,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+});
+
 const orderSchema = new mongoose.Schema({
   restaurant: { type: mongoose.Schema.Types.ObjectId, ref: "Restaurant" },
   user: { type: mongoose.Schema.ObjectId, ref: "User" },
@@ -29,11 +49,7 @@ const orderSchema = new mongoose.Schema({
     },
   },
 
-  cartItems: [
-    { menuItemId: { type: String, required: true } },
-    { quantity: { type: Number, required: true } },
-    { menuItemId: { type: String, required: true } },
-  ],
+  cartItems: [cartItemsSchema],
 
   totalAmount: Number,
   status: {

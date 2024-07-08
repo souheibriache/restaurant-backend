@@ -1,7 +1,12 @@
-import mongoose from "mongoose";
+import mongoose, { InferSchemaType } from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  auth0Id: {
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    default: new mongoose.Types.ObjectId(),
+  },
+  password: {
     type: String,
     required: true,
   },
@@ -28,4 +33,6 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", userSchema);
+
+export type UserType = InferSchemaType<typeof userSchema>;
 export default User;

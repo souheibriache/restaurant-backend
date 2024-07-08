@@ -1,13 +1,28 @@
 import { NextFunction, Request, Response } from "express";
-import { auth } from "express-oauth2-jwt-bearer";
 import * as jwt from "jsonwebtoken";
 import User from "../models/user";
-export const jwtCheck = auth({
-  audience: process.env.AUTH0_AUDIENCE,
-  issuerBaseURL: process.env.AUTH0_BASE_URL,
-  tokenSigningAlg: process.env.AUTH0_SIGN_IN_ALG,
-});
 
+const JWT_AUTH_KEY = process.env.JWT_AUTH_KEY as string;
+
+export const jwtCheck = (req: Request, res: Response, next: NextFunction) => {
+  const { authorization } = req.headers;
+  console.log({ authorization });
+
+  if (!authorization || !authorization.startsWith("Bearer ")) {
+    return res.sendStatus(401).json({ message: "Unauthorized" });
+  }
+
+  const token = authorization.split(" ")[1];
+
+  jwt.verify(token, JWT_AUTH_KEY, (error, decoded) => {
+    if (error)
+      return res.status(401).json({ message: "Authentication failed" });
+    console.log({ decoded });
+    req.userId = (decoded as any).userId;
+    console.log({ userId: req.userId });
+    next();
+  });
+};
 declare global {
   namespace Express {
     interface Request {

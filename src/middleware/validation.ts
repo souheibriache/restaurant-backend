@@ -1,5 +1,17 @@
 import { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
+import Joi from "joi";
+
+export const validateRequest =
+  (schema: Joi.ObjectSchema<any>) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { error, value } = schema.validate(req.body);
+    console.log(error);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+    next();
+  };
 
 const handleValidationErrors = async (
   req: Request,
@@ -7,7 +19,7 @@ const handleValidationErrors = async (
   next: NextFunction
 ) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty) {
+  if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
   next();
@@ -15,12 +27,13 @@ const handleValidationErrors = async (
 
 export const validateMyUserRequest = [
   body("name").isString().notEmpty().withMessage("Name must be a string"),
-  body("addressLine1")
+  body("eamil").isEmail(),
+  body("password")
     .isString()
-    .notEmpty()
-    .withMessage("addressLine1 must be a string"),
-  body("country").isString().notEmpty().withMessage("country must be a string"),
-  body("city").isString().notEmpty().withMessage("City must be a string"),
+    .isLength({ min: 6 })
+    .withMessage(
+      "Password must include at least: \n - 1 lowercase \n - 1 uppercase \n - 1 digit"
+    ),
   handleValidationErrors,
 ];
 
